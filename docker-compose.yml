@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hospital-roster-postgres
+    environment:
+      POSTGRES_DB: roster_db
+      POSTGRES_USER: roster
+      POSTGRES_PASSWORD: roster
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U roster -d roster_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: hospital-roster-api
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://roster:roster@postgres:5432/roster_db
+      BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api
+    container_name: hospital-roster-web
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
