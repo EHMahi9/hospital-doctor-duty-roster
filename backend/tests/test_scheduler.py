@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.core.config import settings
 from app.core.security import get_password_hash
 from app.db.base import Base
 from app.models.department import Department
@@ -31,7 +32,7 @@ def seed_minimum(db):
     admin = User(
         email="admin@test.local",
         full_name="Admin",
-        hashed_password=get_password_hash("12345678"),
+        hashed_password=get_password_hash(settings.default_admin_password),
         role=UserRole.ADMIN,
     )
     db.add_all([department, admin])

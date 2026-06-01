@@ -29,14 +29,26 @@ def ensure_initial_data(db: Session) -> None:
         if not exists:
             db.add(Department(name=name, code=code))
 
-    admin = db.query(User).filter(User.email == settings.first_super_admin_email).one_or_none()
-    if not admin:
+    super_admin = db.query(User).filter(User.email == settings.first_super_admin_email).one_or_none()
+    if not super_admin:
         db.add(
             User(
                 email=settings.first_super_admin_email,
                 full_name="System Super Admin",
                 hashed_password=get_password_hash(settings.first_super_admin_password),
                 role=UserRole.SUPER_ADMIN,
+                is_active=True,
+            )
+        )
+
+    admin = db.query(User).filter(User.email == settings.default_admin_email).one_or_none()
+    if not admin:
+        db.add(
+            User(
+                email=settings.default_admin_email,
+                full_name="Hospital Admin",
+                hashed_password=get_password_hash(settings.default_admin_password),
+                role=UserRole.ADMIN,
                 is_active=True,
             )
         )

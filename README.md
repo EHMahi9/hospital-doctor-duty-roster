@@ -71,6 +71,7 @@ VITE_API_BASE_URL=https://your-render-backend.onrender.com/api
 ```
 
 Use the production example file in `frontend/.env.production.example` as the template.
+Use `FIRST_SUPER_ADMIN_EMAIL`, `FIRST_SUPER_ADMIN_PASSWORD`, `DEFAULT_ADMIN_EMAIL`, and `DEFAULT_ADMIN_PASSWORD` in `.env` to change the default logins.
 
 Seeded logins:
 

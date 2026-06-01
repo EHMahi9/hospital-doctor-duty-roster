@@ -15,6 +15,7 @@ from app.models.doctor import Doctor
 from app.models.enums import LeaveStatus, LeaveType, PreferredShift, UserRole
 from app.models.leave import LeaveRequest
 from app.models.user import User
+from app.core.config import settings
 from app.services.roster_scheduler import RosterScheduler
 
 SAMPLE_DOCTORS = [
@@ -38,13 +39,13 @@ SAMPLE_DOCTORS = [
 
 
 def upsert_admin(db) -> User:
-    admin = db.query(User).filter(User.email == "momenulislam900@gmail.com").one_or_none()
+    admin = db.query(User).filter(User.email == settings.default_admin_email).one_or_none()
     if admin:
         return admin
     admin = User(
-        email="momenulislam900@gmail.com",
+        email=settings.default_admin_email,
         full_name="Hospital Admin",
-        hashed_password=get_password_hash("12345678"),
+        hashed_password=get_password_hash(settings.default_admin_password),
         role=UserRole.ADMIN,
         is_active=True,
     )
@@ -117,7 +118,7 @@ def main() -> None:
         today = date.today()
         result = scheduler.generate_monthly_roster(month=today.month, year=today.year, actor=admin, overwrite=True, seed=202605)
         print(
-            f"Seed complete. Admin login: momenulislam900@gmail.com / 12345678. "
+            f"Seed complete. Admin login: {settings.default_admin_email} / {settings.default_admin_password}. "
             f"Doctor login password: Doctor@123. Generated {result['assignments_created']} duties."
         )
     finally:

@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     backend_cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     first_super_admin_email: str = "goodmorning1293@gmail.com"
     first_super_admin_password: str = "Mahi1234@"
+    default_admin_email: str = "momenulislam900@gmail.com"
+    default_admin_password: str = "12345678"
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
