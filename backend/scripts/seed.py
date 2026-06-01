@@ -38,13 +38,13 @@ SAMPLE_DOCTORS = [
 
 
 def upsert_admin(db) -> User:
-    admin = db.query(User).filter(User.email == "admin@hospital.bd").one_or_none()
+    admin = db.query(User).filter(User.email == "momenulislam900@gmail.com").one_or_none()
     if admin:
         return admin
     admin = User(
-        email="admin@hospital.bd",
+        email="momenulislam900@gmail.com",
         full_name="Hospital Admin",
-        hashed_password=get_password_hash("Admin@123"),
+        hashed_password=get_password_hash("12345678"),
         role=UserRole.ADMIN,
         is_active=True,
     )
@@ -117,7 +117,7 @@ def main() -> None:
         today = date.today()
         result = scheduler.generate_monthly_roster(month=today.month, year=today.year, actor=admin, overwrite=True, seed=202605)
         print(
-            f"Seed complete. Admin login: admin@hospital.bd / Admin@123. "
+            f"Seed complete. Admin login: momenulislam900@gmail.com / 12345678. "
             f"Doctor login password: Doctor@123. Generated {result['assignments_created']} duties."
         )
     finally:

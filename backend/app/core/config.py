@@ -1,7 +1,5 @@
 from functools import lru_cache
-from typing import Any
 
-from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,12 +11,9 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 12
-    backend_cors_origins: list[AnyHttpUrl | str] = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ]
-    first_super_admin_email: str = "superadmin@hospital.bd"
-    first_super_admin_password: str = "SuperAdmin@123"
+    backend_cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    first_super_admin_email: str = "goodmorning1293@gmail.com"
+    first_super_admin_password: str = "Mahi1234@"
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
@@ -32,12 +27,9 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    @field_validator("backend_cors_origins", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, value: Any) -> Any:
-        if isinstance(value, str):
-            return [item.strip() for item in value.split(",") if item.strip()]
-        return value
+    @property
+    def backend_cors_origins_list(self) -> list[str]:
+        return [item.strip() for item in self.backend_cors_origins.split(",") if item.strip()]
 
 
 @lru_cache

@@ -74,8 +74,8 @@ Use the production example file in `frontend/.env.production.example` as the tem
 
 Seeded logins:
 
-- Super admin: `superadmin@hospital.bd` / `SuperAdmin@123`
-- Admin: `admin@hospital.bd` / `Admin@123`
+- Super admin: `goodmorning1293@gmail.com` / `Mahi1234@`
+- Admin: `momenulislam900@gmail.com` / `12345678`
 - Sample doctors: use any seeded doctor email / `Doctor@123`
 
 ## Local Development

@@ -31,7 +31,7 @@ def seed_minimum(db):
     admin = User(
         email="admin@test.local",
         full_name="Admin",
-        hashed_password=get_password_hash("Admin@123"),
+        hashed_password=get_password_hash("12345678"),
         role=UserRole.ADMIN,
     )
     db.add_all([department, admin])
