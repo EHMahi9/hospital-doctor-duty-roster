@@ -58,6 +58,20 @@ docker compose exec backend python scripts/seed.py
 - Frontend: http://localhost:8080
 - Backend docs: http://localhost:8000/api/docs
 
+## Deployment Split
+
+- Frontend: Vercel
+- Backend API: Render
+- Database: Neon PostgreSQL
+
+For Vercel, set the project root to `frontend/` and add this environment variable:
+
+```bash
+VITE_API_BASE_URL=https://your-render-backend.onrender.com/api
+```
+
+Use the production example file in `frontend/.env.production.example` as the template.
+
 Seeded logins:
 
 - Super admin: `superadmin@hospital.bd` / `SuperAdmin@123`
