@@ -74,6 +74,16 @@ Use the production example file in `frontend/.env.production.example` as the tem
 Use `FIRST_SUPER_ADMIN_EMAIL`, `FIRST_SUPER_ADMIN_PASSWORD`, `DEFAULT_ADMIN_EMAIL`, and `DEFAULT_ADMIN_PASSWORD` in `.env` to change the default logins.
 For Render, add `BACKEND_CORS_ORIGIN_REGEX=https://.*\.vercel\.app` so the Vercel frontend can talk to the API without CORS errors.
 
+Render backend setup:
+
+- Use the repo-level `render.yaml` blueprint, or set the existing service manually to:
+  - Runtime: `Python`
+  - Root Directory: `backend`
+  - Build Command: `pip install -r requirements.txt`
+  - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Do not set a Docker build context for the Python backend service.
+- If you see `lstat /opt/render/project/src/backend/backend`, it means the service is pointing at the `backend` folder twice. Remove the extra `backend` from the root/build context settings and redeploy.
+
 Seeded logins:
 
 - Super admin: `goodmorning1293@gmail.com` / `Mahi1234@`
