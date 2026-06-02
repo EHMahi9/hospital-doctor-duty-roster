@@ -24,9 +24,15 @@ def list_leaves(
     from_date: date | None = None,
     to_date: date | None = None,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> list[LeaveRequest]:
     query = db.query(LeaveRequest).options(joinedload(LeaveRequest.doctor).joinedload(Doctor.department))
+    if current_user.role == UserRole.DOCTOR:
+        if not current_user.doctor_profile:
+            return []
+        query = query.filter(LeaveRequest.doctor_id == current_user.doctor_profile.id)
+    elif current_user.role == UserRole.STAFF:
+        return []
     if doctor_id:
         query = query.filter(LeaveRequest.doctor_id == doctor_id)
     if status_filter:
@@ -44,6 +50,8 @@ def apply_leave(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> LeaveRequest:
+    if current_user.role == UserRole.STAFF:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Staff accounts can view rosters only.")
     doctor = db.query(Doctor).filter(Doctor.id == payload.doctor_id, Doctor.is_active.is_(True)).one_or_none()
     if not doctor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Doctor not found.")
@@ -121,7 +129,7 @@ def leave_conflicts(
     from_date: date | None = None,
     to_date: date | None = None,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)),
 ) -> list[LeaveConflict]:
     query = (
         db.query(LeaveRequest, DutyAssignment)

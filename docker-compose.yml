@@ -23,7 +23,7 @@ services:
     env_file:
       - ./.env
     environment:
-      DATABASE_URL: postgresql+psycopg2://roster:roster@postgres:5432/roster_db
+      DATABASE_URL: postgresql+psycopg://roster:roster@postgres:5432/roster_db
       BACKEND_CORS_ORIGINS: http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173
     ports:
       - "8000:8000"

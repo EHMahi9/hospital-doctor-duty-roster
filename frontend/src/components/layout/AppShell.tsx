@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { BarChart3, CalendarDays, ClipboardList, LayoutDashboard, LogOut, Stethoscope, UserRoundCog } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { isAdminRole } from "@/lib/roles";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,7 @@ const navigation = [
 export function AppShell() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const visibleNavigation = isAdminRole(user?.role) ? navigation : navigation.filter((item) => item.href === "/roster");
 
   return (
     <div className="min-h-screen">
@@ -33,7 +35,7 @@ export function AppShell() {
             </div>
           </div>
           <nav className="flex-1 space-y-1 p-4">
-            {navigation.map((item) => (
+            {visibleNavigation.map((item) => (
               <NavLink
                 key={item.href}
                 to={item.href}
@@ -89,7 +91,7 @@ export function AppShell() {
             </Button>
           </div>
           <nav className="mt-3 flex gap-2 overflow-x-auto pb-1">
-            {navigation.map((item) => (
+            {visibleNavigation.map((item) => (
               <NavLink
                 key={item.href}
                 to={item.href}

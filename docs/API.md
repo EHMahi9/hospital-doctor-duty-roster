@@ -13,6 +13,7 @@ Authorization: Bearer <access_token>
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |
 | POST | `/auth/login` | Public | Login and receive JWT |
+| POST | `/auth/register` | Public when enabled | Create staff roster-view account or claim an existing doctor profile |
 | GET | `/auth/me` | Authenticated | Current user profile |
 | POST | `/auth/users` | Super Admin, Admin | Create user account |
 
@@ -32,10 +33,10 @@ Authorization: Bearer <access_token>
 
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |
-| GET | `/leaves` | Authenticated | List leaves by doctor/status/date |
-| POST | `/leaves` | Authenticated | Apply leave |
+| GET | `/leaves` | Super Admin, Admin; own records for Doctor | List leaves by doctor/status/date |
+| POST | `/leaves` | Super Admin, Admin, Doctor | Apply leave |
 | PATCH | `/leaves/{leave_id}/decision` | Super Admin, Admin | Approve/reject leave |
-| GET | `/leaves/conflicts` | Authenticated | Approved leave vs roster conflicts |
+| GET | `/leaves/conflicts` | Super Admin, Admin | Approved leave vs roster conflicts |
 
 ## Roster
 
@@ -53,8 +54,8 @@ Authorization: Bearer <access_token>
 
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |
-| GET | `/analytics/overview` | Authenticated | Dashboard cards and charts |
-| GET | `/analytics/balance-ledger` | Authenticated | Fairness/workload ledger |
+| GET | `/analytics/overview` | Super Admin, Admin | Dashboard cards and charts |
+| GET | `/analytics/balance-ledger` | Super Admin, Admin | Fairness/workload ledger |
 
 ## Notifications and Audit
 

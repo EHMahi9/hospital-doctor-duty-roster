@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -33,6 +34,13 @@ class UserCreate(BaseModel):
     password: str = Field(min_length=8)
     role: UserRole = UserRole.STAFF
     is_active: bool = True
+
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    full_name: str = Field(min_length=2, max_length=160)
+    password: str = Field(min_length=8)
+    account_type: Literal["staff", "doctor"] = "staff"
 
 
 class UserRead(TokenUser):

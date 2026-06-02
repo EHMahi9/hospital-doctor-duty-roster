@@ -25,6 +25,13 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface RegisterPayload {
+  email: string;
+  full_name: string;
+  password: string;
+  account_type: "staff" | "doctor";
+}
+
 export interface Department {
   id: number;
   name: string;
@@ -46,6 +53,11 @@ export interface Doctor {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface DoctorCreatePayload extends Partial<Doctor> {
+  initial_password?: string;
+  create_user_account?: boolean;
 }
 
 export interface LeaveRequest {

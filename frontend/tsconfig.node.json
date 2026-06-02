@@ -8,9 +8,7 @@
     "moduleResolution": "NodeNext",
     "types": ["node"],
     "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "checkJs": false,
     "noEmit": true
   },
-  "include": ["vite.config.js"]
+  "include": ["vite.config.ts"]
 }

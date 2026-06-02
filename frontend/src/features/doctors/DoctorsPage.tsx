@@ -23,7 +23,9 @@ const emptyForm = {
   max_monthly_duty: 12,
   preferred_shift: "flexible" as PreferredShift,
   weekly_off_day: "Friday",
-  is_active: true
+  is_active: true,
+  create_user_account: true,
+  initial_password: "Doctor@123"
 };
 
 type DoctorForm = typeof emptyForm;
@@ -85,18 +87,25 @@ export function DoctorsPage() {
       max_monthly_duty: doctor.max_monthly_duty,
       preferred_shift: doctor.preferred_shift,
       weekly_off_day: doctor.weekly_off_day,
-      is_active: doctor.is_active
+      is_active: doctor.is_active,
+      create_user_account: true,
+      initial_password: "Doctor@123"
     });
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     try {
+      const { create_user_account, initial_password, ...doctorPayload } = form;
       if (editingId) {
-        await doctorApi.update(editingId, form);
+        await doctorApi.update(editingId, doctorPayload);
         toast.success("Doctor updated");
       } else {
-        await doctorApi.create({ ...form, create_user_account: true, initial_password: "Doctor@123" });
+        await doctorApi.create({
+          ...doctorPayload,
+          create_user_account,
+          initial_password: create_user_account ? initial_password : undefined
+        });
         toast.success("Doctor added");
       }
       resetForm();
@@ -232,6 +241,32 @@ export function DoctorsPage() {
                 <Label>Phone</Label>
                 <Input value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} required />
               </div>
+              {!editingId ? (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Portal account</Label>
+                    <Select
+                      value={String(form.create_user_account)}
+                      onChange={(event) => setForm({ ...form, create_user_account: event.target.value === "true" })}
+                    >
+                      <option value="true">Create now</option>
+                      <option value="false">Doctor self-registers</option>
+                    </Select>
+                  </div>
+                  {form.create_user_account ? (
+                    <div className="space-y-2">
+                      <Label>Initial password</Label>
+                      <Input
+                        type="password"
+                        minLength={8}
+                        value={form.initial_password}
+                        onChange={(event) => setForm({ ...form, initial_password: event.target.value })}
+                        required
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Department</Label>

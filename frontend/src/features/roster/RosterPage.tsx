@@ -17,7 +17,9 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { downloadBlob, formatMonth } from "@/lib/utils";
+import { isAdminRole } from "@/lib/roles";
+import { cn, downloadBlob, formatMonth } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 import type { Doctor, DutyAssignment, DutyType, MonthlySummary, RosterConflict } from "@/types/api";
 
 const dutyTypes: DutyType[] = [
@@ -38,8 +40,12 @@ const dutyColors: Record<DutyType, string> = {
   Outdoor: "#f59e0b"
 };
 
+const noShortcuts: Record<string, () => void> = {};
+
 export function RosterPage() {
   const today = new Date();
+  const user = useAuthStore((state) => state.user);
+  const canManageRoster = isAdminRole(user?.role);
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [year, setYear] = useState(today.getFullYear());
   const [assignments, setAssignments] = useState<DutyAssignment[]>([]);
@@ -105,9 +111,17 @@ export function RosterPage() {
     }
   }, [load, month, year]);
 
-  useKeyboardShortcuts({
-    "Ctrl+G": generate
-  });
+  const shortcuts = useMemo<Record<string, () => void>>(() => {
+    if (!canManageRoster) {
+      return noShortcuts;
+    }
+    return {
+      "Ctrl+G": () => {
+        void generate();
+      }
+    };
+  }, [canManageRoster, generate]);
+  useKeyboardShortcuts(shortcuts);
 
   const eventData = useMemo(
     () =>
@@ -160,10 +174,12 @@ export function RosterPage() {
           <>
             <Input className="w-24" type="number" min={1} max={12} value={month} onChange={(event) => setMonth(Number(event.target.value))} />
             <Input className="w-28" type="number" min={2020} value={year} onChange={(event) => setYear(Number(event.target.value))} />
-            <Button onClick={generate} disabled={generating}>
-              <RefreshCw className="h-4 w-4" />
-              {generating ? "Generating" : "Generate"}
-            </Button>
+            {canManageRoster ? (
+              <Button onClick={generate} disabled={generating}>
+                <RefreshCw className="h-4 w-4" />
+                {generating ? "Generating" : "Generate"}
+              </Button>
+            ) : null}
             <Button variant="secondary" onClick={() => exportRoster("xlsx")}>
               <FileSpreadsheet className="h-4 w-4" />
               Excel
@@ -213,7 +229,7 @@ export function RosterPage() {
         </Card>
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[1fr_420px]">
+      <section className={cn("grid gap-6", canManageRoster ? "2xl:grid-cols-[1fr_420px]" : "")}>
         <Card className="print-surface min-w-0">
           <CardHeader>
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -245,10 +261,14 @@ export function RosterPage() {
               initialView="dayGridMonth"
               initialDate={`${year}-${String(month).padStart(2, "0")}-01`}
               height="auto"
-              editable
+              editable={canManageRoster}
               events={eventData}
               headerToolbar={{ left: "prev,next today", center: "title", right: "dayGridMonth" }}
               eventDrop={async (info) => {
+                if (!canManageRoster) {
+                  info.revert();
+                  return;
+                }
                 const dutyType = info.event.extendedProps.duty_type as DutyType;
                 const doctorId = Number(info.event.extendedProps.doctor_id);
                 const dutyDate = info.event.start ? format(info.event.start, "yyyy-MM-dd") : "";
@@ -265,69 +285,71 @@ export function RosterPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manual Override</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={submitManual}>
-                <div className="space-y-2">
-                  <Label>Doctor</Label>
-                  <Select value={manual.doctor_id} onChange={(event) => setManual({ ...manual, doctor_id: Number(event.target.value) })}>
-                    {doctors.map((doctor) => (
-                      <option key={doctor.id} value={doctor.id}>
-                        {doctor.name}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+        {canManageRoster ? (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Manual Override</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4" onSubmit={submitManual}>
                   <div className="space-y-2">
-                    <Label>Date</Label>
-                    <Input type="date" value={manual.duty_date} onChange={(event) => setManual({ ...manual, duty_date: event.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Duty</Label>
-                    <Select value={manual.duty_type} onChange={(event) => setManual({ ...manual, duty_type: event.target.value as DutyType })}>
-                      {dutyTypes.map((dutyType) => (
-                        <option key={dutyType} value={dutyType}>
-                          {dutyType}
+                    <Label>Doctor</Label>
+                    <Select value={manual.doctor_id} onChange={(event) => setManual({ ...manual, doctor_id: Number(event.target.value) })}>
+                      {doctors.map((doctor) => (
+                        <option key={doctor.id} value={doctor.id}>
+                          {doctor.name}
                         </option>
                       ))}
                     </Select>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Notes</Label>
-                  <Textarea value={manual.notes} onChange={(event) => setManual({ ...manual, notes: event.target.value })} />
-                </div>
-                <Button className="w-full">
-                  <Save className="h-4 w-4" />
-                  Save override
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Conflict Monitor</CardTitle>
-            </CardHeader>
-            <CardContent className="max-h-[420px] space-y-3 overflow-y-auto">
-              {conflicts.map((conflict, index) => (
-                <div key={`${conflict.code}-${index}`} className="rounded-md border bg-background/70 p-3">
-                  <div className="mb-2 flex items-center justify-between gap-3">
-                    <Badge variant={conflict.severity === "high" ? "destructive" : "warning"}>{conflict.code}</Badge>
-                    <span className="text-xs text-muted-foreground">{conflict.duty_date}</span>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Date</Label>
+                      <Input type="date" value={manual.duty_date} onChange={(event) => setManual({ ...manual, duty_date: event.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Duty</Label>
+                      <Select value={manual.duty_type} onChange={(event) => setManual({ ...manual, duty_type: event.target.value as DutyType })}>
+                        {dutyTypes.map((dutyType) => (
+                          <option key={dutyType} value={dutyType}>
+                            {dutyType}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{conflict.message}</p>
-                </div>
-              ))}
-              {!conflicts.length ? <p className="py-6 text-center text-sm text-muted-foreground">No conflicts detected</p> : null}
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="space-y-2">
+                    <Label>Notes</Label>
+                    <Textarea value={manual.notes} onChange={(event) => setManual({ ...manual, notes: event.target.value })} />
+                  </div>
+                  <Button className="w-full">
+                    <Save className="h-4 w-4" />
+                    Save override
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Conflict Monitor</CardTitle>
+              </CardHeader>
+              <CardContent className="max-h-[420px] space-y-3 overflow-y-auto">
+                {conflicts.map((conflict, index) => (
+                  <div key={`${conflict.code}-${index}`} className="rounded-md border bg-background/70 p-3">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <Badge variant={conflict.severity === "high" ? "destructive" : "warning"}>{conflict.code}</Badge>
+                      <span className="text-xs text-muted-foreground">{conflict.duty_date}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{conflict.message}</p>
+                  </div>
+                ))}
+                {!conflicts.length ? <p className="py-6 text-center text-sm text-muted-foreground">No conflicts detected</p> : null}
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
       </section>
 
       <section className="mt-6">

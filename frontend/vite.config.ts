@@ -9,7 +9,6 @@ const currentDirPath = path.dirname(currentFilePath);
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    preserveSymlinks: true,
     alias: {
       "@": path.resolve(currentDirPath, "./src")
     }

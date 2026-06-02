@@ -4,18 +4,24 @@ import type {
   DashboardOverview,
   Department,
   Doctor,
+  DoctorCreatePayload,
   DutyAssignment,
   DutyType,
   LeaveRequest,
   LeaveStatus,
   LoginResponse,
   MonthlySummary,
+  RegisterPayload,
   RosterConflict
 } from "@/types/api";
 
 export const authApi = {
   login: async (email: string, password: string) => {
     const { data } = await api.post<LoginResponse>("/auth/login", { email, password });
+    return data;
+  },
+  register: async (payload: RegisterPayload) => {
+    const { data } = await api.post<LoginResponse>("/auth/register", payload);
     return data;
   },
   me: async () => {
@@ -29,7 +35,7 @@ export const doctorApi = {
     const { data } = await api.get<Doctor[]>("/doctors", { params });
     return data;
   },
-  create: async (payload: Partial<Doctor> & { initial_password?: string; create_user_account?: boolean }) => {
+  create: async (payload: DoctorCreatePayload) => {
     const { data } = await api.post<Doctor>("/doctors", payload);
     return data;
   },

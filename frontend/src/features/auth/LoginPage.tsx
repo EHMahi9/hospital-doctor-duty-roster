@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { LockKeyhole, Mail, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
 
@@ -92,6 +92,12 @@ export function LoginPage() {
                 {loading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
+            <div className="mt-4 text-center text-sm text-muted-foreground">
+              Need roster access?{" "}
+              <Link className="font-semibold text-primary hover:text-primary/80" to="/register">
+                Create account
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
