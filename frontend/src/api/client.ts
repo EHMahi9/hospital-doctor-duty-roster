@@ -27,6 +27,9 @@ api.interceptors.response.use(
 
 export function errorMessage(error: unknown) {
   if (axios.isAxiosError(error)) {
+    if (error.code === "ERR_NETWORK" || error.message === "Network Error") {
+      return "Cannot reach the backend API. Check VITE_API_BASE_URL in Vercel and the Render CORS settings, then redeploy.";
+    }
     const detail = error.response?.data?.detail;
     if (Array.isArray(detail)) {
       return detail.map((item) => item.message ?? JSON.stringify(item)).join(", ");

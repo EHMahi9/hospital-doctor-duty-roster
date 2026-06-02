@@ -72,12 +72,15 @@ VITE_API_BASE_URL=https://your-render-backend.onrender.com/api
 
 Use the production example file in `frontend/.env.production.example` as the template.
 Use `FIRST_SUPER_ADMIN_EMAIL`, `FIRST_SUPER_ADMIN_PASSWORD`, `DEFAULT_ADMIN_EMAIL`, and `DEFAULT_ADMIN_PASSWORD` in `.env` to change the default logins.
+For Render, add `BACKEND_CORS_ORIGIN_REGEX=https://.*\.vercel\.app` so the Vercel frontend can talk to the API without CORS errors.
 
 Seeded logins:
 
 - Super admin: `goodmorning1293@gmail.com` / `Mahi1234@`
 - Admin: `momenulislam900@gmail.com` / `12345678`
 - Sample doctors: use any seeded doctor email / `Doctor@123`
+
+If the Vercel login page shows a network error, the frontend is usually missing the Render API URL or the backend CORS settings are not deployed yet. Set `VITE_API_BASE_URL` in Vercel, make sure Render has `BACKEND_CORS_ORIGIN_REGEX=https://.*\.vercel\.app`, and redeploy both services.
 
 ## Local Development
 

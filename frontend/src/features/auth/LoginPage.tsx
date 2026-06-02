@@ -57,12 +57,20 @@ export function LoginPage() {
             <CardTitle>Secure Login</CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4" onSubmit={onSubmit}>
+            <form className="space-y-4" autoComplete="off" onSubmit={onSubmit}>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input id="email" type="email" className="pl-9" value={email} onChange={(event) => setEmail(event.target.value)} />
+                  <Input
+                    id="email"
+                    name="login-email"
+                    type="email"
+                    autoComplete="off"
+                    className="pl-9"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
@@ -71,7 +79,9 @@ export function LoginPage() {
                   <LockKeyhole className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
+                    name="login-password"
                     type="password"
+                    autoComplete="new-password"
                     className="pl-9"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
