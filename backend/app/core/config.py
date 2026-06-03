@@ -15,8 +15,8 @@ class Settings(BaseSettings):
     backend_cors_origin_regex: str = r"https://.*\.vercel\.app"
     first_super_admin_email: str = "goodmorning1293@gmail.com"
     first_super_admin_password: str = "Mahi1234@"
-    default_admin_email: str = "momenulislam900@gmail.com"
-    default_admin_password: str = "12345678"
+    default_admin_email: str = "vaibongo20@gmail.com"
+    default_admin_password: str = "Mahi12345@@"
     allow_public_registration: bool = True
     smtp_host: str | None = None
     smtp_port: int = 587
