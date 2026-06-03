@@ -14,8 +14,8 @@ import { useAuthStore } from "@/store/authStore";
 export function LoginPage() {
   const navigate = useNavigate();
   const { token, setSession } = useAuthStore();
-  const [email, setEmail] = useState("momenulislam900@gmail.com");
-  const [password, setPassword] = useState("12345678");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   if (token) {
